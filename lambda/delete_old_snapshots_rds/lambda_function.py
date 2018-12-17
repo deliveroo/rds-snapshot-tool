@@ -41,9 +41,9 @@ def lambda_handler(event, context):
 
     filtered_list = get_own_snapshots_source(PATTERN, response)
 
-    for snapshot in filtered_list.keys():
+    for snapshot, snapshot_object in filtered_list.items():
 
-        creation_date = get_timestamp(snapshot, filtered_list)
+        creation_date = snapshot_object.timestamp
 
         if creation_date:
             difference = datetime.now() - creation_date
@@ -52,7 +52,7 @@ def lambda_handler(event, context):
                          (snapshot, days_difference))
 
             # if we are past RETENTION_DAYS
-            if days_difference > RETENTION_DAYS:
+            if days_difference > RETENTION_DAYS and snapshot_object.is_own_snapshot:
                 # delete it
                 logger.info('Deleting %s' % snapshot)
 
@@ -64,8 +64,8 @@ def lambda_handler(event, context):
                     pending_delete += 1
                     logger.info('Could not delete %s ' % snapshot)
 
-        else: 
-            logger.info('Not deleting %s. Created only %s' % (snapshot, days_difference))
+        else:
+            logger.info('Not deleting %s.' % (snapshot,))
 
 
     if pending_delete > 0:
