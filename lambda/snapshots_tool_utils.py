@@ -292,7 +292,6 @@ class DBSnapshot:
 
     @property
     def timestamp(self):
-        # Searches for a timestamp on a snapshot name
         pattern = "%s-(.+)" % self.db_snapshot_dict["DBInstanceIdentifier"]
         snapshot_identifier = self.db_snapshot_dict["DBSnapshotIdentifier"]
         date_time = re.search(pattern, snapshot_identifier)

@@ -56,7 +56,7 @@ def lambda_handler(event, context):
     dest_snapshots = get_own_snapshots_dest(PATTERN, response_dest)
 
     for source_identifier, source_attributes in source_snapshots.items():
-        creation_date = get_timestamp(source_identifier, source_snapshots)
+        creation_date = source_attributes.timestamp
         if creation_date:
             time_difference = datetime.now() - creation_date
             days_difference = time_difference.total_seconds() / 3600 / 24
@@ -67,6 +67,7 @@ def lambda_handler(event, context):
                 if (
                     source_identifier not in dest_snapshots.keys()
                     and REGION != DESTINATION_REGION
+                    and source_attributes.is_own_snapshot
                 ):
                     if source_snapshots[source_identifier]["Status"] == "available":
                         try:
