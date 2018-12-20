@@ -108,7 +108,7 @@ def search_tag_copied(response):
     # Search for a tag indicating we copied this snapshot
     try:
         for tag in response["TagList"]:
-            if tag["Key"] == "CopiedBy" and tag["Value"] == "Snapshot Tool for RDS":
+            if tag["Key"] == "CreatedBy" and tag["Value"] == "Snapshot Tool for RDS":
                 return True
 
     except Exception:

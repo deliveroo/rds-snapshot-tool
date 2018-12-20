@@ -50,12 +50,12 @@ def lambda_handler(event, context):
             snapshot_arn = filtered_list[snapshot]["Arn"]
             response_tags = client.list_tags_for_resource(ResourceName=snapshot_arn)
 
-            if search_tag_copied(response_tags):
-                difference = datetime.now() - creation_date
-                days_difference = difference.total_seconds() / 3600 / 24
+            difference = datetime.now() - creation_date
+            days_difference = difference.total_seconds() / 3600 / 24
 
-                # if we are past RETENTION_DAYS
-                if days_difference > RETENTION_DAYS:
+            # if we are past RETENTION_DAYS
+            if days_difference > RETENTION_DAYS:
+                if search_tag_copied(response_tags):
                     # delete it
                     logger.info(
                         "Deleting %s. %s days old" % (snapshot, days_difference)
@@ -69,13 +69,13 @@ def lambda_handler(event, context):
                         logger.info("Could not delete %s" % snapshot)
 
                 else:
-                    logger.info(
-                        "Not deleting %s. Only %s days old"
-                        % (snapshot, days_difference)
-                    )
-
+                    logger.info("Not deleting %s. Did not find correct tag" % snapshot)
             else:
-                logger.info("Not deleting %s. Did not find correct tag" % snapshot)
+                logger.info(
+                    "Not deleting %s. Only %s days old"
+                    % (snapshot, days_difference)
+                )
+
 
     if delete_pending > 0:
         log_message = "Snapshots pending delete: %s" % delete_pending
